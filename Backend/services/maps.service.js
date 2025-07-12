@@ -3,12 +3,12 @@ const captainModel = require('../models/captain.model');
 
 module.exports.getAddressCoordinate = async (address) => {
     const apiKey = process.env.GOOGLE_MAPS_API;
-    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`;
-    console.log(" GOOGLE_MAPS_API:", apiKey);
-    console.log(" Request URL:", url);
+    const url =  `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`;
+
+
     try {
         const response = await axios.get(url);
-        console.log(" Google response:", response.data);
+        console.log("Geocoding API response:", response.data);
         if (response.data.status === 'OK') {
             const location = response.data.results[ 0 ].geometry.location;
             return {
@@ -16,11 +16,10 @@ module.exports.getAddressCoordinate = async (address) => {
                 lng: location.lng
             };
         } else {
-             console.error("Google API Error:", response.data);
-            throw new Error('Unable to fetch coordinates');
+            throw new Error(`Unable to fetch coordinates: ${response.data.status} - ${response.data.error_message || 'No error message'}`);
         }
     } catch (error) {
-        console.error(error);
+        console.error("Geocoding Error:", error.message);
         throw error;
     }
 }
